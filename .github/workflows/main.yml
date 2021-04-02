@@ -27,3 +27,16 @@ jobs:
       # There are ~900 warnings in existing code, so we can't use "no warnings allowed" mode (yet?).
       - name: RUN -- luacheck .
         run: luacheck --no-color . || [[ $? -le 1 ]]
+  # Create .pak file for each GitHub release.
+  pack-assets:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ${{ github.sha }} >sample-pak-file.txt
+      - name: Add .pak file to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: sample-pak-file.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
