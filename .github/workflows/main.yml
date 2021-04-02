@@ -31,7 +31,6 @@ jobs:
         run: luacheck --no-color . || [[ $? -le 1 ]]
   # Create .pak file for each GitHub release.
   pack-assets:
-    # if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +42,7 @@ jobs:
       # Test with "tar" instead of asset_packer.
       - run: ls -l FrackinUniverse.pak
       - name: Add .pak file to release
-        if: ${{ false }}
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: FrackinUniverse.pak
