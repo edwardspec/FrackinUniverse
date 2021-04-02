@@ -41,7 +41,7 @@ jobs:
         with:
           outputFilename: FrackinUniverse.pak
       # Test with "tar" instead of asset_packer.
-      - run: tar -tzf FrackinUniverse.pak | wc -l
+      - run: ls -l FrackinUniverse.pak
       - name: Add .pak file to release
         if: ${{ false }}
         uses: softprops/action-gh-release@v1
