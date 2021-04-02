@@ -35,12 +35,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - run: echo ${{ github.sha }} >sample-pak-file.txt
       - uses: edwardspec/github-action-pack-starbound-mod@master
+        with:
+          outputFilename: FrackinUniverse.pak
+      # Test with "tar" instead of asset_packer.
+      - run: tar -tf FrackinUniverse.pak | wc -l
       - name: Add .pak file to release
         if: ${{ false }}
         uses: softprops/action-gh-release@v1
         with:
-          files: sample-pak-file.txt
+          files: FrackinUniverse.pak
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
