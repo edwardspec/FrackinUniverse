@@ -1,0 +1,17 @@
+{
+	"errorNoAcronyms": "^red;ERROR:^reset; Researches missing acronyms",
+	"errorNoAcronyms2": "ERROR\nMISSING ACRONYMS",
+	"errorNoData": "ERROR - Missing text data for selected research",
+	"errorNoTrees": "No Trees Available",
+	"essence": "Essence",
+	"howToZoom": "Zoom to a research by clicking on it in the list",
+	"noTreeSelected": "NO RESEARCH TREE SELECTED",
+	"pixels": "Pixels",
+	"readonly": "READ ONLY!",
+	"research": "Research",
+	"selectTree": "Select a research tree",
+	"willConsumeCurrency": "Will consume currency",
+	"willConsumeItems": "Will consume items",
+	"willNotConsumeCurrency": "Will not consume currency",
+	"willNotConsumeItems": "Will not consume items"
+}

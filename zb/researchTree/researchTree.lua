@@ -29,6 +29,7 @@ noCost = false
 
 -- Basic GUI functions
 function init()
+	_ = root.assetJson("/zb/researchTree/text.json")
 
 	currencyTable = root.assetJson("/currencies.config")
 	data = root.assetJson("/zb/researchTree/data.config")
@@ -254,7 +255,7 @@ function searchButton()
 		if widget.active("treeList") then treePickButton() end
 
 		searchListRepopulationCooldown = data.searchListRepopulationInterval
-		widget.setText("title", "Zoom to a research by clicking on it in the list")
+		widget.setText("title", _.howToZoom)
 		widget.setVisible("researchButton", false)
 		widget.setVisible("consumptionText", false)
 		widget.setVisible("searchList", true)
@@ -286,15 +287,15 @@ function treePickButton()
 		local consumptionRules = getTreeConsumptionRules(selectedTree)
 
 		if consumptionRules.currency then
-			consumeText = '^red; Will consume currency'
+			consumeText = '^red; ' .. _.willConsumeCurrency
 		else
-			consumeText = '^green; Will not consume currency'
+			consumeText = '^green;' .. _.willNotConsumeCurrency
 		end
 
 		if consumptionRules.items then
-			consumeText = consumeText..'\n^red; Will consume items'
+			consumeText = consumeText..'\n^red; ' .. _.willConsumeItems
 		else
-			consumeText = consumeText..'\n^green; Will not consume items'
+			consumeText = consumeText..'\n^green; ' .. _.willNotConsumeItems
 		end
 
 		widget.setText("consumptionText", consumeText)
@@ -307,7 +308,7 @@ function treePickButton()
 		if widget.active("searchList") then searchButton() end
 
 		searchListRepopulationCooldown = data.searchListRepopulationInterval
-		widget.setText("title", "Select a research tree")
+		widget.setText("title", _.selectTree)
 		widget.setVisible("researchButton", false)
 		widget.setVisible("consumptionText", false)
 		widget.setVisible("treeList", true)
@@ -344,7 +345,7 @@ function updateInfoPanel()
 				widget.setText("infoList.text", data.strings.research[selected][2])
 			else
 				widget.setText("title", selected)
-				widget.setText("infoList.text", "ERROR - Missing text data for selected research")
+				widget.setText("infoList.text", _.errorNoData)
 			end
 
 			if researchTree[selected].price then
@@ -499,7 +500,7 @@ function populateTreeList()
 
 	if (#toSort == 0) then
 		local listItem = "treeList.list."..widget.addListItem("treeList.list")
-		widget.setText(listItem..".title", '^red;No Trees Available')
+		widget.setText(listItem..".title", '^red;' .. _.errorNoTrees)
 		widget.setButtonEnabled(listItem..".title", false)
 	else
 		table.sort(toSort, function(a, b) return a.name:upper() < b.name:upper() end)
@@ -559,7 +560,7 @@ function draw()
 
 	-- Draw "READ ONLY"
 	if readOnly then
-		canvas:drawText("READ ONLY!", {position = {57, canvasSize[2]-2}}, 7, "#FF5E66F0")
+		canvas:drawText(_.readonly, {position = {57, canvasSize[2]-2}}, 7, "#FF5E66F0")
 	end
 
 	-- Draw research nodes
@@ -641,7 +642,7 @@ function draw()
 			end
 		end
 	else
-		canvas:drawText("NO RESEARCH TREE SELECTED", {position = {canvasSize[1]*0.5, canvasSize[2]*0.5}, horizontalAnchor = "mid", verticalAnchor = "mid"}, 20, "#FF5E66F0")
+		canvas:drawText(_.noTreeSelected, {position = {canvasSize[1]*0.5, canvasSize[2]*0.5}, horizontalAnchor = "mid", verticalAnchor = "mid"}, 20, "#FF5E66F0")
 	end
 
 	-- Draw currencies
@@ -655,9 +656,9 @@ function draw()
 			if mousePosition[1] >= startPoint[1]-1 and mousePosition[1] <= startPoint[1] + 8
 			and mousePosition[2] >= startPoint[2]-1 and mousePosition[2] <= startPoint[2] + 8 then
 				if tbl[1] == "essence" then
-					canvas:drawText("Essence", {position = {startPoint[1] + 8 + 3, startPoint[2]}, verticalAnchor = "bottom"}, 7, tbl[2])
+					canvas:drawText(_.essence, {position = {startPoint[1] + 8 + 3, startPoint[2]}, verticalAnchor = "bottom"}, 7, tbl[2])
 				elseif tbl[1] == "money" then
-					canvas:drawText("Pixels", {position = {startPoint[1] + 8 + 3, startPoint[2]}, verticalAnchor = "bottom"}, 7, tbl[2])
+					canvas:drawText(_.pixels, {position = {startPoint[1] + 8 + 3, startPoint[2]}, verticalAnchor = "bottom"}, 7, tbl[2])
 				else
 					canvas:drawText(data.strings.currencies[tbl[1]] or tbl[1], {position = {startPoint[1] + 8 + 3, startPoint[2]}, verticalAnchor = "bottom"}, 7, tbl[2])
 				end
@@ -843,10 +844,10 @@ function verifyAcronims()
 		widget.setVisible("treePickButton", false)
 		widget.setVisible("centerButton", false)
 		widget.setVisible("searchButton", false)
-		widget.setText("title", "^red;ERROR:^reset; Researches missing acronyms")
+		widget.setText("title", _.errorNoAcronyms)
 		widget.setText("infoList.text", missing)
 		canvas:drawLine({0, canvasSize[2]*0.5}, {canvasSize[1], canvasSize[2]*0.5}, "#16232BF0", canvasSize[2]*2)
-		canvas:drawText("ERROR\nMISSING ACRONYMS", {position = {canvasSize[1]*0.5, canvasSize[2]*0.5}, horizontalAnchor = "mid", verticalAnchor = "mid"}, 20, "#FF5E66F0")
+		canvas:drawText(_.errorNoAcronyms2, {position = {canvasSize[1]*0.5, canvasSize[2]*0.5}, horizontalAnchor = "mid", verticalAnchor = "mid"}, 20, "#FF5E66F0")
 
 		return false
 	end
@@ -1068,7 +1069,7 @@ cheats = {
 
 	nostringsonme = function()
 		readOnly = false
-		widget.setText("researchButton", "Research")
+		widget.setText("researchButton", _.research)
 		if selected and researchTree[selected].state == "available" then
 			widget.setButtonEnabled("researchButton", true)
 		else
