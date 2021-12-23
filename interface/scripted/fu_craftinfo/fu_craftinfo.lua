@@ -279,20 +279,6 @@ end
 
 -- Materials list
 
-local categoriesToSkipForUnlocks = {
-	furniture = true,
-	decorative = true,
-	block = true,
-	light = true,
-	storage = true,
-	fridgeStorage = true,
-	legarmour = true,
-	headarmour = true,
-	terraformer = true,
-	clothingDye = true,
-	door = true
-}
-
 function registerMaterial(mat, station)
 	if materialsMissing[mat] then return end
 	if not materials[mat] then
@@ -311,15 +297,18 @@ function registerMaterial(mat, station)
 			-- workaround: show something with trunk and leaf info
 			data.config.inventoryIcon = '/interface/scripted/fu_craftinfo/sapling.png'
 		else
+			if station == 'Research' then
+				if mat:match('head$') or mat:match('helm$') or mat:match('helmet$') or mat:match('pants$') or mat:match('legs$') or mat:match('table$') or mat:match('door$') or mat:match('chair$') then
+					materialsMissing[mat] = true
+					return
+				end
+			end
+
 			data = root.itemConfig(mat)
 			if not data then
 				materialsMissing[mat] = true
 				-- commented out the creation of warnings cause recipes exist for mods not always installed
 				-- sb.logInfo("Crafting Info Display found non-existent item '%s'", mat)
-				return
-			end
-
-			if station == 'Research' and categoriesToSkipForUnlocks[data.category] then
 				return
 			end
 
