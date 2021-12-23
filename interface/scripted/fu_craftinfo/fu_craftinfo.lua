@@ -593,9 +593,15 @@ end
 -- "Unlocked by" information for output item.
 
 function getTreeUnlockMats(itemUnlocks, station)
+	local timeStart = os.clock()
+
+	local count = 0
 	for itemCode in pairs(itemUnlocks) do
 		registerMaterial(itemCode, station)
+		count = count + 1
 	end
+
+	sb.logInfo("Lab Directory: added '%s' unlocked items, elapsed time: %s.", count, os.clock() - timeStart)
 end
 
 function doTreeUnlock(list, itemUnlocks, itemIn, itemOut, objectName)
