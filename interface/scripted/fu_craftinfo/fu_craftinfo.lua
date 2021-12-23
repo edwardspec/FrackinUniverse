@@ -49,6 +49,39 @@ function init()
 	liquidLab = root.assetJson("/objects/power/fu_liquidmixer/fu_liquidmixer_recipes.config")
 	autopsyLab = root.assetJson('/objects/minibiome/elder/embalmingtable/embalmingtable_recipes.config')
 
+	-- Remember which item is unlocked by which node(s).
+	-- { itemCode1 = { "name of node 1", "name of node 2" }, itemCode2 = ... }
+	itemCodeToResearchNode = {}
+
+	for _, treeFilename in ipairs( {
+		"/zb/researchTree/fu_agriculture.config",
+		"/zb/researchTree/fu_chemistry.config",
+		"/zb/researchTree/fu_craftsmanship.config",
+		"/zb/researchTree/fu_engineering.config",
+		"/zb/researchTree/fu_geology.config",
+		"/zb/researchTree/fu_power.config",
+		"/zb/researchTree/fu_warcraft.config",
+		"/zb/researchTree/madness.config"
+	} ) do
+		local treeConf = root.assetJson(treeFilename)
+		local _, treeName = next(treeConf.strings.trees)
+
+		-- This string is appended to node names:
+		local treeSuffix = ' (' .. treeName .. ' tree)'
+
+		local _, nodes = next(treeConf.researchTree)
+		for nodeId, nodeConf in pairs(nodes) do
+			local nodeName = treeConf.strings.research[nodeId][1] .. treeSuffix
+			for _, itemCode in ipairs(nodeConf.unlocks or {}) do
+				if not itemCodeToResearchNode[itemCode] then
+					itemCodeToResearchNode[itemCode] = {}
+				end
+				table.insert(itemCodeToResearchNode[itemCode], nodeName)
+			end
+
+		end
+	end
+
 	self.matfilter = getFilter()
 	-- script.setUpdateDelta(1) -- is there even a reason for this ? commented out
 	script.setUpdateDelta(0) -- imported from update() function
@@ -74,7 +107,8 @@ function init()
 
 	-- relocalized  to before getNearbyStations execution
 	recognisedObjects = { -- we need this one for the ordering of display results
-		-- in order of processing
+		-- in order of processing,
+		"Research",
 		"quantumextractor",
 		"extractionlabadv",
 		"extractionlab",
@@ -121,6 +155,7 @@ function init()
 		["embalmingtable"] = true
 	}
 	nearbystationsfound = getNearbyStations() -- this should limit the searching for stations nearby everytime the lists are updated
+	nearbystationsfound["Research"] = true -- Always show research unlocks (doesn't require nearby stations)
 	-- however it also means if a new station is added, you need to exit & reenter the lab directory//craftinfo for it to show
 
 	local found = nearbystationsfound
@@ -167,6 +202,8 @@ function init()
 		processObjects["fu_liquidmixer"]		= { mats = getExtractionMats, spew = doLiquidInteraction, data = liquidLab } end
 	if found["embalmingtable"] then
 		processObjects["embalmingtable"]		= { mats = getExtractionMats, spew = doAutopsy, data = autopsyLab } end
+
+	processObjects["Research"] = { mats = getTreeUnlockMats, spew = doTreeUnlock, data = itemCodeToResearchNode }
 
 --[[	processObjects = {
 		extractionlab         = { mats = getExtractionMats, spew = doExtraction, data = extractionLab },
@@ -551,6 +588,23 @@ function concatLiquid(list, resultquantity, sep)
 			end
 	end
 	return out
+end
+
+-- "Unlocked by" information for output item.
+
+function getTreeUnlockMats(itemUnlocks, station)
+	for itemCode in pairs(itemUnlocks) do
+		registerMaterial(itemCode, station)
+	end
+end
+
+function doTreeUnlock(list, itemUnlocks, itemIn, itemOut, objectName)
+	if itemOut then
+		local nodeNames = itemUnlocks[itemOut]
+		if nodeNames then
+			addTextItem("!", "Unlocked by: " .. table.concat(nodeNames, ", "), list)
+		end
+	end
 end
 
 -- Autopsy Table
