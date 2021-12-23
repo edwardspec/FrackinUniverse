@@ -279,6 +279,20 @@ end
 
 -- Materials list
 
+local categoriesToSkipForUnlocks = {
+	furniture = true,
+	decorative = true,
+	block = true,
+	light = true,
+	storage = true,
+	fridgeStorage = true,
+	legarmour = true,
+	headarmour = true,
+	terraformer = true,
+	clothingDye = true,
+	door = true
+}
+
 function registerMaterial(mat, station)
 	if materialsMissing[mat] then return end
 	if not materials[mat] then
@@ -302,6 +316,10 @@ function registerMaterial(mat, station)
 				materialsMissing[mat] = true
 				-- commented out the creation of warnings cause recipes exist for mods not always installed
 				-- sb.logInfo("Crafting Info Display found non-existent item '%s'", mat)
+				return
+			end
+
+			if station == 'Research' and categoriesToSkipForUnlocks[data.category] then
 				return
 			end
 
