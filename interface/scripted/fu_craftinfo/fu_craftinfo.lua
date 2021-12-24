@@ -49,6 +49,13 @@ function init()
 	liquidLab = root.assetJson("/objects/power/fu_liquidmixer/fu_liquidmixer_recipes.config")
 	autopsyLab = root.assetJson('/objects/minibiome/elder/embalmingtable/embalmingtable_recipes.config')
 
+	-- Cache to reduce performance impact of root.itemConfig(),
+	-- maps item ID to shortdescription and icon (for all known items).
+
+	local timeStart = os.clock()
+	itemsCache = root.assetJson('/scripts/all_items_cache.json')
+	sb.logInfo("Lab Directory: loaded items cache, elapsed time: %s.", os.clock() - timeStart)
+
 	-- Remember which item is unlocked by which node(s).
 	-- { itemCode1 = { "name of node 1", "name of node 2" }, itemCode2 = ... }
 	itemCodeToResearchNode = {}
@@ -288,37 +295,42 @@ function registerMaterial(mat, station)
 			materialsMissing[mat] = true
 			return
 		end
+
+		local shortdescription, icon
+
 		-- saplings are special-cased
 		local sapling = mat == 'sapling'
 		local data
 		if sapling then
-			data = root.itemConfig({ name = mat, data = { stemName = 'pineytree' } })
+			shortdescription = 'Sapling'
 
 			-- workaround: show something with trunk and leaf info
-			data.config.inventoryIcon = '/interface/scripted/fu_craftinfo/sapling.png'
+			icon = '/interface/scripted/fu_craftinfo/sapling.png'
 		else
-			if station == 'Research' then
-				if mat:match('head$') or mat:match('helm$') or mat:match('helmet$') or mat:match('pants$') or mat:match('legs$') or mat:match('table$') or mat:match('door$') or mat:match('chair$') then
+			local cached = itemsCache[mat]
+			if cached then
+				shortdescription = cached.name
+				icon = canonicalise(cached.icon, '/')
+			else
+				data = root.itemConfig(mat)
+				if not data then
 					materialsMissing[mat] = true
+					-- commented out the creation of warnings cause recipes exist for mods not always installed
+					-- sb.logInfo("Crafting Info Display found non-existent item '%s'", mat)
 					return
 				end
-			end
 
-			data = root.itemConfig(mat)
-			if not data then
-				materialsMissing[mat] = true
-				-- commented out the creation of warnings cause recipes exist for mods not always installed
-				-- sb.logInfo("Crafting Info Display found non-existent item '%s'", mat)
-				return
-			end
+				icon = data.config.inventoryIcon
+				if type(icon) == 'table' then
+					-- handle multi-icon items by just using the first icon (broken, I know)
+					icon = icon[1].image
+				end
 
-			if type(data.config.inventoryIcon) == 'table' then
-				-- handle multi-icon items by just using the first icon (broken, I know)
-				data.config.inventoryIcon = data.config.inventoryIcon[1].image
+				icon = canonicalise(icon, data.directory)
 			end
 		end
 
-		materials[mat] = { stations = {}, id = mat, name = data.config.shortdescription, icon = rescale(canonicalise(data.config.inventoryIcon, data.directory), 16, 16) }
+		materials[mat] = { stations = {}, id = mat, name = shortdescription, icon = rescale(icon, 16, 16) }
 		table.insert(materialsSorted, materials[mat])
 	end
 	materials[mat].stations[station] = true
