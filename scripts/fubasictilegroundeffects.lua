@@ -59,7 +59,7 @@ function update(dt)
       end
 
       --applyTileEffects(groundMat)
-      softness = currentTile["softness"]
+      softness = currentTile["softness"] or 1
       --softness = self.matCheck[groundMat][9]
       -- check for brittle tiles and damage them
       brittleTiles(yVelChange, minimumFallVel, groundMat, offset)
@@ -68,7 +68,7 @@ function update(dt)
 
   -- falling damage
   if self.fallDistance > minimumFallDistance and yVelChange > minimumFallVel and onGround then
-    local damage = (self.fallDistance - minimumFallDistance) * fallDistanceDamageFactor * softness
+    local damage = (self.fallDistance - minimumFallDistance) * fallDistanceDamageFactor / softness
     damage = damage * (1.0 + (world.gravity(self.position) - baseGravity) * gravityDiffFactor)
     damage = damage * status.stat("fallDamageMultiplier")
     status.applySelfDamageRequest({
