@@ -10,7 +10,31 @@ ignore = {
 
 	-- It's unfortunate to have to disable this warning (it is really good at catching real typos),
 	-- but the log would be flooded with 1000 "unused argument dt" or "unused argument shiftHeld".
-	"212", -- "unused argument"
+	-- "212", -- "unused argument"
+	"212/args",
+	"212/board",
+	"212/button",
+	"212/directory",
+	"212/dt",
+	"212/entityId",
+	"212/fireMode",
+	"212/isButtonDown",
+	"212/isLocal",
+	"212/level",
+	"212/msgName",
+	"212/node",
+	"212/npcId",
+	"212/operation",
+	"212/output",
+	"212/plan",
+	"212/position",
+	"212/seed",
+	"212/self",
+	"212/shiftHeld",
+	"212/stateData",
+	"212/stateName",
+	"212/widgetData",
+	"212/widgetName",
 
 	-- Skip "empty if branch", most (if not all) current cases
 	-- seem to do this intentionally for better readability.
