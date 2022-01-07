@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get install -y luarocks && sudo luarocks install luacheck
       - name: RUN -- luacheck .
-        run: luacheck --no-color --quiet .
+        run: luacheck --no-color --quiet -d tests/vanilla_lua_mocks.lua .
 
   # Create .pak file for each GitHub release.
   pack-assets:

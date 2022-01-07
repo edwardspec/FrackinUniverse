@@ -6,7 +6,7 @@ ignore = {
 	-- due to how Starbound isolates Lua files, not using "local" for these variables is not a problem.
 	"111", -- "setting non-standard global variable [...]"
 	"112", -- "mutating non-standard global variable [...]"
-	"113", -- "accessing undefined variable [...]"
+	--"113", -- "accessing undefined variable [...]"
 
 	-- It's unfortunate to have to disable this warning (it is really good at catching real typos),
 	-- but the log would be flooded with 1000 "unused argument dt" or "unused argument shiftHeld".
@@ -29,7 +29,12 @@ ignore = {
 globals = {
 	"item",
 	"self",
-	"storage"
+	"storage",
+
+	-- FU globals
+	"effectHandlerList",
+	"power",
+	"transferUtil"
 }
 
 -- These global variables are allowed, but can't be modified.
@@ -49,7 +54,21 @@ read_globals = {
 	"object",
 	"player",
 	"root",
-	"world"
+	"world",
+
+	-- More variables from Starbound API.
+	"activeItem",
+	"animator",
+	"effect",
+	"mcontroller",
+	"message",
+	"pane",
+	"projectile",
+	"sb",
+	"script",
+	"status",
+	"vehicle",
+	"widget"
 }
 
 codes = true -- Show luacheck's error/warning codes. Useful for adding exceptions.
@@ -71,3 +90,11 @@ exclude_files = {
 	-- Example files (can have unreachable code, etc.)
 	"**/stats/effects/fu_armoreffects/setbonus_Templates/**"
 }
+
+module = true
+
+files["tests/vanilla_lua_mocks.lua"] = { module = false }
+
+files["items/active/**"] = { ignore = {
+	"113/WeaponAbility" -- "accessing undefined variable"
+} }
