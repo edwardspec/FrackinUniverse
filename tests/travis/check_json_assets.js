@@ -55,6 +55,19 @@ class JsonAssetsTest {
 		this.checkLiquidInteractions();
 		this.checkMonsters();
 
+		// Warn about different craftable items having the same human-readable name.
+		var knownShortDescriptions = new Set();
+		for ( var data of this.knownAssets.values() ) {
+			var shortdescription = data.shortdescription;
+			if ( shortdescription && this.craftableItemCodes.has( data.itemName || data.objectName ) ) {
+				if ( knownShortDescriptions.has( shortdescription ) ) {
+					this.fail( 'Duplicate shortdescription: ' + shortdescription );
+				}
+
+				knownShortDescriptions.add( shortdescription );
+			}
+		}
+
 		console.log( 'Checked ' + totalAssetCount + ' JSON files. Errors: ' + this.failedCount + '.\n' );
 		return this.failedCount === 0;
 	}
