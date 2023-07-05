@@ -102,8 +102,25 @@ function power.sendPowerToBatteries()
 	end
 end
 
-function power.onNodeConnectionChange(arg,iterations)
+function power.onNodeConnectionChange(arg, iterations, updateId)
 	if power.objectPowerType then
+		if not updateId then
+			-- Because this function is called recursively, we need to make sure
+			-- that it won't be calculating the same information many times for the same object.
+			-- To detect "this object has already been processed":
+			-- 1) We generate a unique ID of this "update all objects" operation,
+			-- 2) We remember that this object has already been affected by operation with this ID.
+			-- 3) onNodeConnectionChange() won't do anything if this object has already been affected.
+			self.powerUpdateId = math.random(0, 1000000000)
+		elseif updateId == self.powerUpdateId then
+			-- This object has already been processed.
+			sb.logInfo("Avoided recursion in update %s", updateId) -- TODO: this line should be commented in production
+			return
+		else
+			-- This object will be processed now.
+			self.powerUpdateId = updateId
+		end
+
 		local inputCounter=0
 		local outputCounter=0
 		if (power.objectPowerType == 'battery') then return arg end
@@ -136,7 +153,7 @@ function power.onNodeConnectionChange(arg,iterations)
 										table.insert(entitylist.output,value)
 									end
 									table.insert(entitylist.all,value)
-									entitylist = (callEntity(value,'power.onNodeConnectionChange',entitylist,iterations) or entitylist)
+									entitylist = (callEntity(value,'power.onNodeConnectionChange',entitylist,iterations,self.powerUpdateId) or entitylist)
 								elseif entitylist.all[j] == value then
 									break
 								end
@@ -160,7 +177,7 @@ function power.onNodeConnectionChange(arg,iterations)
 										table.insert(entitylist.output,value)
 									end
 									table.insert(entitylist.all,value)
-									entitylist = (callEntity(value,'power.onNodeConnectionChange',entitylist,iterations) or entitylist)
+									entitylist = (callEntity(value,'power.onNodeConnectionChange',entitylist,iterations,self.powerUpdateId) or entitylist)
 								elseif entitylist.all[j] == value then
 									break
 								end
