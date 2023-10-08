@@ -54,6 +54,7 @@ class JsonAssetsTest {
 		this.checkTreeUnlocks();
 		this.checkLiquidInteractions();
 		this.checkMonsters();
+		this.checkMaterials();
 
 		console.log( 'Checked ' + totalAssetCount + ' JSON files. Errors: ' + this.failedCount + '.\n' );
 		return this.failedCount === 0;
@@ -508,6 +509,21 @@ class JsonAssetsTest {
 					this.fail( filename, 'Unknown item sold at the shop: ' + itemCode );
 				}
 			} );
+		}
+	}
+
+	/**
+	 * Check if matitem files have unknown material IDs.
+	 */
+	checkMaterials() {
+		for ( var [ filename, data ] of this.knownAssets ) {
+			if ( !filename.endsWith( '.matitem' ) ) {
+				continue;
+			}
+
+			if ( !this.knownMaterials.has( data.materialId ) ) {
+				this.fail( filename, 'Unknown material ID: ' + data.materialId );
+			}
 		}
 	}
 
