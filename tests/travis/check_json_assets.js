@@ -206,6 +206,22 @@ class JsonAssetsTest {
 					}
 				}
 
+				// Check that bioweapons and energy weapons are annotated in the description.
+				if ( filename.startsWith( 'items/active/weapons' ) ) {
+					let itemTags = data.itemTags || [],
+						description = ( data.description || '' ).replace( /\n/g, ' ' ),
+						category = data.category || '';
+
+					if ( itemTags.includes( 'bioweapon' ) && !description.match( /Bio-?weapon/i ) && category !== 'bioweapon' ) {
+						this.fail( '\n', filename, 'Weapon description doesn\'t tell that this is a bioweapon: <<<', description, '>>>' );
+					}
+					if ( itemTags.includes( 'energy' ) && category !== 'energy' &&
+						!description.match( /Energy|Counts as 'energy' for set bonuses/ )
+					) {
+						this.fail( '\n', filename, 'Weapon description doesn\'t tell that this is an energy weapon: <<<', description, '>>>' );
+					}
+				}
+
 				// No more checks for items.
 				continue;
 			}
