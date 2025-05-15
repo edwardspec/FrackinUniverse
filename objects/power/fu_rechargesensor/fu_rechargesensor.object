@@ -10,6 +10,13 @@
   "price" : 150,
   "tooltipKind" : "base",
 
+  "chatStrings" : {
+    "noBatteries": "No batteries found.",
+    "tooltip": "Found batteries: ^green;%s^reset; (^yellow;%s%%^reset; full)\nCurrent state: %s.",
+    "statusOn": "^green;ON^reset; (needs charging) until all batteries become ^yellow;%s%%^reset; full",
+    "statusOff": "^red;OFF^reset; (doesn't need charging) until all batteries are less than ^yellow;%s%%^reset; full"
+  },
+
   "inventoryIcon" : "fu_conduit.png:default.1",
   "orientations" : [
     {

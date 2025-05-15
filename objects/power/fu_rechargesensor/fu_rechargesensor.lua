@@ -11,6 +11,7 @@ function init()
 	-- We use 10% instead of 0%, because there can be a small leftover charge in the battery (too little to spend).
 	self.activatePercent = config.getParameter("activatePercent") or 10
 	self.deactivatePercent = config.getParameter("deactivatePercent") or 100
+	self.chatStrings = config.getParameter("chatStrings")
 
 	-- True if currently sending "On" signal.
 	storage.needRecharge = storage.needRecharge or false
@@ -24,14 +25,20 @@ function update(dt)
 
 	local maxCapacity = 0
 	local currentCharge = 0
+	local numBatteries = 0
 
 	for _, entityId in ipairs(power.entitylist.battery) do
-		currentCharge = currentCharge + ( callEntity(entityId, 'power.getStoredEnergy') or 0 )
-		maxCapacity = maxCapacity + ( callEntity(entityId, 'power.getMaxEnergy') or 0 )
+		local capacity = callEntity(entityId, 'power.getMaxEnergy')
+		if capacity then
+			maxCapacity = maxCapacity + capacity
+			currentCharge = currentCharge + ( callEntity(entityId, 'power.getStoredEnergy') or 0 )
+			numBatteries = numBatteries + 1
+		end
 	end
 
 	if maxCapacity == 0 then
 		-- No batteries on this conduit.
+		object.setConfigParameter('description', self.chatStrings.noBatteries)
 		return
 	end
 
@@ -43,4 +50,18 @@ function update(dt)
 	end
 
 	object.setOutputNodeLevel(0, storage.needRecharge)
+
+	-- Update scan text.
+	local statusTooltip
+	if storage.needRecharge then
+		statusTooltip = string.format(self.chatStrings.statusOn, self.deactivatePercent)
+	else
+		statusTooltip = string.format(self.chatStrings.statusOff, self.activatePercent)
+	end
+
+	object.setConfigParameter('description', string.format(self.chatStrings.tooltip,
+		numBatteries,
+		math.floor(percent * 2) / 2, -- Rounded to the multiple of 0.5
+		statusTooltip
+	))
 end
