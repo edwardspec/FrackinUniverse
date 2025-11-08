@@ -39,6 +39,7 @@ function update(dt)
 	if maxCapacity == 0 then
 		-- No batteries on this conduit.
 		object.setConfigParameter('description', self.chatStrings.noBatteries)
+		animator.setAnimationState('switchState', 'off')
 		return
 	end
 
@@ -51,12 +52,14 @@ function update(dt)
 
 	object.setOutputNodeLevel(0, storage.needRecharge)
 
-	-- Update scan text.
+	-- Update scan text and appearance.
 	local statusTooltip
 	if storage.needRecharge then
 		statusTooltip = string.format(self.chatStrings.statusOn, self.deactivatePercent)
+		animator.setAnimationState('switchState', 'on')
 	else
 		statusTooltip = string.format(self.chatStrings.statusOff, self.activatePercent)
+		animator.setAnimationState('switchState', 'off')
 	end
 
 	object.setConfigParameter('description', string.format(self.chatStrings.tooltip,
