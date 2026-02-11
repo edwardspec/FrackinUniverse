@@ -1317,13 +1317,6 @@ function update(dt)
 			self.baseDamage = math.min(math.abs(mcontroller.velocity()[2]) * self.mechMass,300)
 			self.appliedDamage = self.baseDamage /2
 
-			-- if it falls too hard, the mech takes some damage based on how far its gone
-			self.baseDamageMechfall = math.min(math.abs(mcontroller.velocity()[2]) * self.mechMass)/2
-
-			if self.mechMass >= 15 and (self.baseDamageMechfall) >= 220 and (self.jumpBoostTimer) == 0 then		--mech takes damage from stomps
-				storage.health = math.max(0, storage.health - (self.baseDamage /100))
-			end
-
 			if self.mechMass > 0 and time <= 0 then
 				time = 1
 				local thumpParamsBig = {
