@@ -641,11 +641,6 @@ function update(dt)
 					self.manualFlightMode = false
 				end
 
-				if self.manualFlightMode and mcontroller.yVelocity() > 0 and mcontroller.isColliding() then
-					setFlightMode(false)
-					self.manualFlightMode = false
-				end
-
 						if not self.hasTouchedControlsRecently and self.manualFlightMode then
 							local vel = mcontroller.velocity()
 							if vel[1] ~= 0 or vel[2] ~= 0 then
